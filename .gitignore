@@ -30,3 +30,23 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Log files
+*.log
+
+# Binaries
+/bin/
+/dist/
+
+# Temporary files
+*.tmp
+*.temp
+*_backup
+
+# macOS
+.DS_Store
