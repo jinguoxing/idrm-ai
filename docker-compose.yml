@@ -1,0 +1,79 @@
+# IDRM 菜单管理服务 - Docker Compose 配置
+# 用于本地开发和测试
+
+version: '3.8'
+
+services:
+  # MySQL数据库
+  mysql:
+    image: mysql:8.0
+    container_name: idrm-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: idrm_db
+      MYSQL_USER: idrm_user
+      MYSQL_PASSWORD: idrm_pass
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./deploy/migrations:/docker-entrypoint-initdb.d
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+08:00
+    networks:
+      - idrm-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis缓存
+  redis:
+    image: redis:7-alpine
+    container_name: idrm-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - idrm-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 菜单管理服务
+  menu-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: idrm-menu-api
+    ports:
+      - "8080:8080"
+    environment:
+      - DATASOURCE=idrm_user:idrm_pass@tcp(mysql:3306)/idrm_db?charset=utf8mb4&parseTime=true&loc=Local
+      - GORM_DSN=idrm_user:idrm_pass@tcp(mysql:3306)/idrm_db?charset=utf8mb4&parseTime=true&loc=Local
+      - REDIS_HOST=redis:6379
+      - REDIS_PASS=
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - idrm-network
+    restart: unless-stopped
+
+volumes:
+  mysql-data:
+  redis-data:
+
+networks:
+  idrm-network:
+    driver: bridge

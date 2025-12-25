@@ -1,0 +1,26 @@
+# IDRM 菜单管理服务配置文件 - SQLite演示版本
+# 使用SQLite数据库，无需安装MySQL
+
+Name: idrm-menu-api
+Host: 0.0.0.0
+Port: 8080
+
+# 超时配置（毫秒）
+Timeout: 30000
+
+# 数据库配置 - 使用SQLite
+DataSource: ./idrm.db
+
+# GORM数据源 - 使用SQLite
+GormDSN: ./idrm.db
+
+# Redis配置（可选，演示时不需要）
+RedisHost: 127.0.0.1:6379
+RedisPass: ""
+RedisType: node
+
+# 日志配置
+Log:
+  ServiceName: idrm-menu-api
+  Mode: console
+  Level: info

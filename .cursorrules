@@ -1,0 +1,80 @@
+# IDRM Project AI Rules
+
+You are an AI assistant working on the IDRM project, an intelligent data resource management platform built with Go-Zero.
+
+## Project Context
+
+- **Tech Stack**: Go 1.21+, Go-Zero v1.9+, MySQL 8.0, Redis, Kafka
+- **Architecture**: Layered (Handler → Logic → Model)
+- **ORM**: Dual ORM (GORM + SQLx)
+- **Specs Location**: `/specs/`
+
+## Core Principles
+
+1. **Always read specs first**: Before any implementation, check `constitution.md`
+2. **Follow 4-phase workflow**: Specify → Plan → Tasks → Implement
+3. **Layered architecture**: Strictly follow Handler → Logic → Model separation
+4. **Dual ORM pattern**: Use Model interface, support both GORM and SQLx
+
+## Architecture Rules
+
+### Handler Layer (`api/internal/handler/`)
+- ✅ Parse HTTP requests
+- ✅ Call Logic layer
+- ✅ Return unified response
+- ❌ NO business logic
+- ❌ NO direct database access
+
+### Logic Layer (`api/internal/logic/`)
+- ✅ Implement business rules
+- ✅ Call Model layer
+- ✅ Data transformation
+- ❌ NO HTTP-related code
+- ❌ NO direct database access
+
+### Model Layer (`model/{module}/{table}/`)
+- ✅ Define data access interface
+- ✅ Implement CRUD operations
+- ✅ Transaction management
+- ❌ NO business logic
+
+## Coding Standards
+
+### File Naming
+- Handler: `{action}{resource}handler.go`
+- Logic: `{action}{resource}logic.go`
+- Model GORM: `gorm_dao.go`
+- Model SQLx: `sqlx_model.go`
+
+### Code Style
+- Use `gofmt` for formatting
+- Import grouping: stdlib → third-party → internal
+- Error wrapping: Use `%w` not `%v`
+- Comments: Chinese, comprehensive
+
+### Error Handling
+- Never ignore errors
+- Use `fmt.Errorf("context: %w", err)`
+- Define errors in `vars.go`
+
+## Before Generating Code
+
+1. Ask me to confirm the specification
+2. Show me the technical plan
+3. Break down into tasks (<50 lines each)
+4. Implement incrementally
+
+## References
+
+- Constitution: `constitution.md`
+- Layered Architecture: `.specs/architecture/layered-architecture.md`
+- Dual ORM: `.specs/architecture/dual-orm-pattern.md`
+- Go Style: `.specs/coding-standards/go-style-guide.md`
+
+## Quality Standards
+
+- ✅ Compile successfully
+- ✅ Pass tests
+- ✅ No golangci-lint errors
+- ✅ Functions < 50 lines
+- ✅ All public items have comments

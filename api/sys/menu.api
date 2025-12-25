@@ -1,0 +1,152 @@
+syntax = "v1"
+
+info(
+	title: "菜单管理接口"
+	desc: "系统菜单管理模块，支持多级树形结构"
+	author: "IDRM Team"
+	version: "v1.0"
+)
+
+import "base.api"
+
+// 菜单管理相关接口
+@server(
+	prefix: /api/v1/sys/menu
+	group: menu
+)
+service idrm-api {
+	@doc "创建菜单"
+	@handler createMenu
+	post /menu (CreateMenuReq) returns (CreateMenuResp)
+
+	@doc "更新菜单"
+	@handler updateMenu
+	put /menu/:id (UpdateMenuReq) returns (UpdateMenuResp)
+
+	@doc "删除菜单"
+	@handler deleteMenu
+	delete /menu/:id (DeleteMenuReq) returns (DeleteMenuResp)
+
+	@doc "获取菜单详情"
+	@handler getMenu
+	get /menu/:id (GetMenuReq) returns (GetMenuResp)
+
+	@doc "获取菜单树"
+	@handler getMenuTree
+	get /menu/tree (GetMenuTreeReq) returns (GetMenuTreeResp)
+
+	@doc "获取菜单列表"
+	@handler listMenus
+	get /menus (ListMenusReq) returns (ListMenusResp)
+}
+
+// ========== 请求定义 ==========
+
+// CreateMenuReq 创建菜单请求
+type CreateMenuReq {
+	ParentId     int64  `json:"parentId"`     // 父级菜单ID，0表示根菜单
+	Name         string `json:"name"`         // 菜单名称
+	RoutePath    string `json:"routePath,optional"`    // 路由路径
+	ComponentPath string `json:"componentPath,optional"` // 组件路径
+	Icon         string `json:"icon,optional"`         // 菜单图标
+	SortOrder    int    `json:"sortOrder"`             // 排序号
+	PermTag      string `json:"permTag,optional"`      // 权限标识
+	Status       int    `json:"status,optional,default=1"` // 状态：1-启用，0-禁用
+}
+
+// UpdateMenuReq 更新菜单请求
+type UpdateMenuReq {
+	Id           int64  `json:"id"`           // 菜单ID（路径参数）
+	ParentId     int64  `json:"parentId"`     // 父级菜单ID，0表示根菜单
+	Name         string `json:"name"`         // 菜单名称
+	RoutePath    string `json:"routePath,optional"`    // 路由路径
+	ComponentPath string `json:"componentPath,optional"` // 组件路径
+	Icon         string `json:"icon,optional"`         // 菜单图标
+	SortOrder    int    `json:"sortOrder"`             // 排序号
+	PermTag      string `json:"permTag,optional"`      // 权限标识
+	Status       int    `json:"status,optional,default=1"` // 状态：1-启用，0-禁用
+}
+
+// DeleteMenuReq 删除菜单请求
+type DeleteMenuReq {
+	Id int64 `path:"id"` // 菜单ID
+}
+
+// GetMenuReq 获取菜单详情请求
+type GetMenuReq {
+	Id int64 `path:"id"` // 菜单ID
+}
+
+// GetMenuTreeReq 获取菜单树请求
+type GetMenuTreeReq {
+	Status int `form:"status,optional"` // 状态筛选：1-启用，0-禁用，不传则全部
+}
+
+// ListMenusReq 获取菜单列表请求
+type ListMenusReq {
+	ParentId int64 `form:"parentId,optional"` // 父级菜单ID，不传则查询所有
+	Status   int   `form:"status,optional"`   // 状态筛选
+	Page     int   `form:"page,optional,default=1"`      // 页码
+	PageSize int   `form:"pageSize,optional,default=20"` // 每页数量
+}
+
+// ========== 响应定义 ==========
+
+// CreateMenuResp 创建菜单响应
+type CreateMenuResp {
+	Id   int64  `json:"id"`   // 菜单ID
+	Name string `json:"name"` // 菜单名称
+}
+
+// UpdateMenuResp 更新菜单响应
+type UpdateMenuResp {
+	Id   int64  `json:"id"`   // 菜单ID
+	Name string `json:"name"` // 菜单名称
+}
+
+// DeleteMenuResp 删除菜单响应
+type DeleteMenuResp {
+	Id int64 `json:"id"` // 菜单ID
+}
+
+// GetMenuResp 获取菜单详情响应
+type GetMenuResp {
+	Id            int64  `json:"id"`             // 菜单ID
+	ParentId      int64  `json:"parentId"`       // 父级菜单ID
+	Name          string `json:"name"`           // 菜单名称
+	RoutePath     string `json:"routePath"`      // 路由路径
+	ComponentPath string `json:"componentPath"`  // 组件路径
+	Icon          string `json:"icon"`           // 菜单图标
+	SortOrder     int    `json:"sortOrder"`      // 排序号
+	PermTag       string `json:"permTag"`        // 权限标识
+	Status        int    `json:"status"`         // 状态
+	CreatedAt     string `json:"createdAt"`      // 创建时间
+	UpdatedAt     string `json:"updatedAt"`      // 更新时间
+}
+
+// MenuTreeNode 菜单树节点
+type MenuTreeNode {
+	Id            int64          `json:"id"`             // 菜单ID
+	ParentId      int64          `json:"parentId"`       // 父级菜单ID
+	Name          string         `json:"name"`           // 菜单名称
+	RoutePath     string         `json:"routePath"`      // 路由路径
+	ComponentPath string         `json:"componentPath"`  // 组件路径
+	Icon          string         `json:"icon"`           // 菜单图标
+	SortOrder     int            `json:"sortOrder"`      // 排序号
+	PermTag       string         `json:"permTag"`        // 权限标识
+	Status        int            `json:"status"`         // 状态
+	Children      []MenuTreeNode `json:"children"`       // 子菜单
+}
+
+// GetMenuTreeResp 获取菜单树响应
+type GetMenuTreeResp {
+	Tree []MenuTreeNode `json:"tree"` // 菜单树
+}
+
+// ListMenusResp 获取菜单列表响应
+type ListMenusResp {
+	Items  []GetMenuResp `json:"items"`  // 菜单列表
+	Total  int64         `json:"total"`  // 总数
+	Page   int           `json:"page"`   // 当前页
+	PageSize int         `json:"pageSize"` // 每页数量
+}
