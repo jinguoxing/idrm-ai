@@ -52,7 +52,7 @@ func (l *ListMenusLogic) ListMenus(req *types.ListMenusReq) (*types.ListMenusRes
 		// 查询所有菜单（带状态过滤）
 		status := -1
 		if req.Status != 0 {
-			status = req.Status
+			status = int(req.Status)
 		}
 		menus, err = l.svcCtx.MenuModel.FindAll(l.ctx, status)
 	}
@@ -80,7 +80,7 @@ func (l *ListMenusLogic) ListMenus(req *types.ListMenusReq) (*types.ListMenusRes
 			logx.Field("pageSize", req.PageSize),
 		)
 		return &types.ListMenusResp{
-			Items:    []types.GetMenuResp{},
+			Items:    []*types.GetMenuResp{},
 			Total:    total,
 			Page:     req.Page,
 			PageSize: req.PageSize,
@@ -94,9 +94,9 @@ func (l *ListMenusLogic) ListMenus(req *types.ListMenusReq) (*types.ListMenusRes
 	pagedMenus := menus[start:end]
 
 	// 5. 数据转换 (model -> types)
-	items := make([]types.GetMenuResp, 0, len(pagedMenus))
+	items := make([]*types.GetMenuResp, 0, len(pagedMenus))
 	for _, m := range pagedMenus {
-		items = append(items, types.GetMenuResp{
+		items = append(items, &types.GetMenuResp{
 			Id:            m.Id,
 			ParentId:      m.ParentId,
 			Name:          m.Name,
@@ -105,7 +105,7 @@ func (l *ListMenusLogic) ListMenus(req *types.ListMenusReq) (*types.ListMenusRes
 			Icon:          m.Icon,
 			SortOrder:     m.SortOrder,
 			PermTag:       m.PermTag,
-			Status:        m.Status,
+			Status:        int8(m.Status), // int -> int8
 			CreatedAt:     m.CreatedAt.Format("2006-01-02 15:04:05"),
 			UpdatedAt:     m.UpdatedAt.Format("2006-01-02 15:04:05"),
 		})

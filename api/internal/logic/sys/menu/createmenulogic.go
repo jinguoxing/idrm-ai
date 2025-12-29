@@ -67,7 +67,7 @@ func (l *CreateMenuLogic) CreateMenu(req *types.CreateMenuReq) (*types.CreateMen
 		Icon:          req.Icon,
 		SortOrder:     req.SortOrder,
 		PermTag:       req.PermTag,
-		Status:        req.Status,
+		Status:        int(req.Status), // int8 -> int
 	}
 
 	// 4. 调用Model层插入数据
@@ -90,8 +90,7 @@ func (l *CreateMenuLogic) CreateMenu(req *types.CreateMenuReq) (*types.CreateMen
 
 	// 6. 返回结果 (model -> types)
 	return &types.CreateMenuResp{
-		Id:   result.Id,
-		Name: result.Name,
+		Id: result.Id,
 	}, nil
 }
 

@@ -34,7 +34,7 @@ func NewGetMenuTreeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetMe
 // 3. 使用Redis缓存（TTL: 1小时）
 func (l *GetMenuTreeLogic) GetMenuTree(req *types.GetMenuTreeReq) (*types.GetMenuTreeResp, error) {
 	// 1. 构建缓存key（暂未使用）
-	_ = l.buildCacheKey(req.Status)
+	_ = l.buildCacheKey(int(req.Status))
 
 	// 2. 尝试从Redis缓存获取（如果配置了Redis）
 	// TODO: 实现Redis缓存逻辑
@@ -46,7 +46,7 @@ func (l *GetMenuTreeLogic) GetMenuTree(req *types.GetMenuTreeReq) (*types.GetMen
 	// 3. 从数据库查询所有菜单
 	status := -1 // 默认查询所有状态
 	if req.Status != 0 {
-		status = req.Status
+		status = int(req.Status)
 	}
 
 	allMenus, err := l.svcCtx.MenuModel.FindAll(l.ctx, status)
@@ -79,8 +79,8 @@ func (l *GetMenuTreeLogic) GetMenuTree(req *types.GetMenuTreeReq) (*types.GetMen
 }
 
 // buildMenuTree 构建菜单树（递归算法）
-func (l *GetMenuTreeLogic) buildMenuTree(menus []*menu.Menu, parentId int64) []types.MenuTreeNode {
-	var tree []types.MenuTreeNode
+func (l *GetMenuTreeLogic) buildMenuTree(menus []*menu.Menu, parentId int64) []*types.MenuTreeNode {
+	var tree []*types.MenuTreeNode
 
 	// 遍历所有菜单，找到属于当前父级的子菜单
 	for _, m := range menus {
@@ -96,8 +96,8 @@ func (l *GetMenuTreeLogic) buildMenuTree(menus []*menu.Menu, parentId int64) []t
 }
 
 // convertToMenuTreeNode 将Model转换为树节点
-func (l *GetMenuTreeLogic) convertToMenuTreeNode(menuData *menu.Menu) types.MenuTreeNode {
-	return types.MenuTreeNode{
+func (l *GetMenuTreeLogic) convertToMenuTreeNode(menuData *menu.Menu) *types.MenuTreeNode {
+	return &types.MenuTreeNode{
 		Id:            menuData.Id,
 		ParentId:      menuData.ParentId,
 		Name:          menuData.Name,
@@ -106,8 +106,8 @@ func (l *GetMenuTreeLogic) convertToMenuTreeNode(menuData *menu.Menu) types.Menu
 		Icon:          menuData.Icon,
 		SortOrder:     menuData.SortOrder,
 		PermTag:       menuData.PermTag,
-		Status:        menuData.Status,
-		Children:      []types.MenuTreeNode{}, // 初始化空切片
+		Status:        int8(menuData.Status), // int -> int8
+		Children:      []*types.MenuTreeNode{}, // 初始化空切片
 	}
 }
 

@@ -1,0 +1,23 @@
+syntax = "v1"
+
+info(
+	title: "IDRM API 基础定义"
+	desc: "通用类型和响应格式"
+	author: "IDRM Team"
+	version: "v1.0"
+)
+
+// ========== 统一响应格式 ==========
+
+// BaseResponse 基础响应
+type BaseResponse {
+	Code      int    `json:"code"`      // 业务状态码
+	Msg       string `json:"msg"`       // 提示信息
+	RequestId string `json:"requestId,optional"` // 请求追踪ID
+}
+
+// PageRequest 分页请求
+type PageRequest {
+	Page     int `form:"page,optional,default=1"`      // 页码
+	PageSize int `form:"pageSize,optional,default=20"` // 每页数量
+}

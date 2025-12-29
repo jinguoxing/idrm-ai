@@ -72,7 +72,7 @@ func (l *GetMenuLogic) convertToGetMenuResp(menuData *menu.Menu) *types.GetMenuR
 		Icon:          menuData.Icon,
 		SortOrder:     menuData.SortOrder,
 		PermTag:       menuData.PermTag,
-		Status:        menuData.Status,
+		Status:        int8(menuData.Status), // int -> int8
 		CreatedAt:     menuData.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt:     menuData.UpdatedAt.Format("2006-01-02 15:04:05"),
 	}

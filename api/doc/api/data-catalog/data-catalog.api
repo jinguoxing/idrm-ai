@@ -1,0 +1,156 @@
+syntax = "v1"
+
+import "../base.api"
+
+info (
+	title:   "数据资源目录接口"
+	desc:    "数据资源目录暂存管理模块"
+	author:  "IDRM Team"
+	version: "v1.0"
+)
+
+// ========== 数据资源目录接口 ==========
+@server (
+	prefix: /api/v1/data-catalog
+	group:  datacatalog
+)
+service idrm-api {
+	@doc "暂存数据资源目录"
+	@handler saveDraft
+	post /draft (SaveDraftReq) returns (SaveDraftResp)
+
+	@doc "获取草稿详情"
+	@handler getDraft
+	get /draft/:id (GetDraftReq) returns (GetDraftResp)
+
+	@doc "获取草稿列表"
+	@handler listDrafts
+	get /drafts (ListDraftsReq) returns (ListDraftsResp)
+
+	@doc "删除草稿"
+	@handler deleteDraft
+	delete /draft/:id (DeleteDraftReq) returns (DeleteDraftResp)
+}
+
+// ========== 请求定义 ==========
+// SaveDraftReq 暂存目录请求
+type SaveDraftReq {
+	// 基本属性
+	CatalogId    string `json:"catalogId,optional"` // 目录ID，空表示创建新草稿
+	Title        string `json:"title"` // 目录名称
+	Description  string `json:"description,optional"` // 资源目录描述
+	SourceDeptId string `json:"sourceDeptId"` // 来源部门ID
+	DataDomain   int8   `json:"dataDomain,optional"` // 数据所在领域
+	// 分类信息
+	CategoryNodeIds []string `json:"categoryNodeIds,optional"` // 资源属性分类节点ID列表
+	// 共享开放
+	SharedType      int8   `json:"sharedType,optional"` // 共享类型：1-无条件 2-有条件 3-不予共享
+	SharedCondition string `json:"sharedCondition,optional"` // 共享条件
+	OpenType        int8   `json:"openType,optional"` // 开放类型：1-向公众开放 2-不向公众开放
+	OpenCondition   string `json:"openCondition,optional"` // 开放条件
+	// 信息项
+	Columns []ColumnItem `json:"columns,optional"` // 信息项列表
+	// 挂接资源
+	MountResources []MountResource `json:"mountResources,optional"` // 挂接资源列表
+	// 更多信息
+	UpdateCycle      int8   `json:"updateCycle,optional"` // 更新频率
+	OtherUpdateCycle string `json:"otherUpdateCycle,optional"` // 其他更新频率
+	SyncMechanism    int8   `json:"syncMechanism,optional"` // 数据归集机制：1-增量 2-全量
+	SyncFrequency    string `json:"syncFrequency,optional"` // 数据归集频率
+}
+
+// ColumnItem 信息项
+type ColumnItem {
+	TechnicalName string `json:"technicalName"` // 技术名称
+	BusinessName  string `json:"businessName,optional"` // 业务名称
+	DataFormat    int8   `json:"dataFormat,optional"` // 字段类型
+	DataLength    int    `json:"dataLength,optional"` // 字段长度
+	DataPrecision int8   `json:"dataPrecision,optional"` // 数据精度
+	Description   string `json:"description,optional"` // 字段描述
+	SharedType    int8   `json:"sharedType,optional"` // 共享属性
+	OpenType      int8   `json:"openType,optional"` // 开放属性
+	PrimaryFlag   bool   `json:"primaryFlag,optional"` // 是否主键
+	NullFlag      bool   `json:"nullFlag,optional"` // 是否为空
+	Index         int    `json:"index"` // 顺序
+}
+
+// MountResource 挂接资源
+type MountResource {
+	ResourceId   string `json:"resourceId"` // 资源ID
+	ResourceType int8   `json:"resourceType"` // 资源类型：1-逻辑视图 2-接口 3-文件资源
+	Name         string `json:"name"` // 资源名称
+}
+
+// GetDraftReq 获取草稿详情请求
+type GetDraftReq {
+	Id string `path:"id"` // 草稿ID
+}
+
+// ListDraftsReq 获取草稿列表请求
+type ListDraftsReq {
+	SourceDeptId string `form:"sourceDeptId,optional"` // 来源部门ID
+	Status       string `form:"status,optional"` // 发布状态
+	Page         int    `form:"page,optional,default=1"`
+	PageSize     int    `form:"pageSize,optional,default=20"`
+}
+
+// DeleteDraftReq 删除草稿请求
+type DeleteDraftReq {
+	Id string `path:"id"` // 草稿ID
+}
+
+// ========== 响应定义 ==========
+// SaveDraftResp 暂存响应
+type SaveDraftResp {
+	CatalogId string `json:"catalogId"` // 目录ID
+	DraftId   string `json:"draftId"` // 草稿ID（如果是草稿副本）
+	Status    string `json:"status"` // 当前状态
+}
+
+// GetDraftResp 获取草稿详情响应
+type GetDraftResp {
+	// 基本信息
+	CatalogId      string `json:"catalogId"`
+	Title          string `json:"title"`
+	Description    string `json:"description"`
+	SourceDeptId   string `json:"sourceDeptId"`
+	SourceDeptName string `json:"sourceDeptName"`
+	DataDomain     int8   `json:"dataDomain"`
+	// 状态信息
+	PublishStatus string `json:"publishStatus"` // 发布状态
+	DraftId       string `json:"draftId"` // 草稿ID
+	IsDraftCopy   bool   `json:"isDraftCopy"` // 是否是草稿副本
+	// 共享开放
+	SharedType      int8   `json:"sharedType"`
+	SharedCondition string `json:"sharedCondition"`
+	OpenType        int8   `json:"openType"`
+	OpenCondition   string `json:"openCondition"`
+	// 信息项
+	Columns []ColumnItem `json:"columns"`
+	// 挂接资源
+	MountResources []MountResource `json:"mountResources"`
+	// 更多信息
+	UpdateCycle      int8   `json:"updateCycle"`
+	OtherUpdateCycle string `json:"otherUpdateCycle"`
+	SyncMechanism    int8   `json:"syncMechanism"`
+	SyncFrequency    string `json:"syncFrequency"`
+	// 分类信息
+	CategoryNodeIds []string `json:"categoryNodeIds"`
+	// 时间信息
+	CreatedAt string `json:"createdAt"`
+	UpdatedAt string `json:"updatedAt"`
+}
+
+// ListDraftsResp 草稿列表响应
+type ListDraftsResp {
+	Items    []GetDraftResp `json:"items"`
+	Total    int64          `json:"total"`
+	Page     int            `json:"page"`
+	PageSize int            `json:"pageSize"`
+}
+
+// DeleteDraftResp 删除草稿响应
+type DeleteDraftResp {
+	Id string `json:"id"` // 删除的草稿ID
+}
+

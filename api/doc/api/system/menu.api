@@ -1,0 +1,113 @@
+syntax = "v1"
+
+import "../base.api"
+
+info (
+	title:   "系统管理模块"
+	desc:    "菜单管理相关接口"
+	author:  "author"
+	email:   "email"
+	version: "v1.0"
+)
+
+@server (
+	prefix: /api/v1/system
+	group:  menu
+	jwt:    Auth
+)
+service idrm-api {
+	@doc "创建菜单"
+	@handler createMenu
+	post /menu (CreateMenuReq) returns (CreateMenuResp)
+
+	@doc "删除菜单"
+	@handler deleteMenu
+	delete /menu/:id (DeleteMenuReq) returns (DeleteMenuResp)
+
+	@doc "获取菜单详情"
+	@handler getMenu
+	get /menu/:id (GetMenuReq) returns (GetMenuResp)
+
+	@doc "获取菜单树"
+	@handler getMenuTree
+	get /menu/tree (GetMenuTreeReq) returns (GetMenuTreeResp)
+
+	@doc "更新菜单"
+	@handler updateMenu
+	put /menu/:id (UpdateMenuReq) returns (UpdateMenuResp)
+}
+
+type (
+	// ========== 创建菜单 ==========
+	CreateMenuReq {
+		ParentId  int64  `json:"parentId,optional"` // 父级菜单ID
+		Name      string `json:"name"` // 菜单名称
+		RoutePath string `json:"routePath,optional"` // 路由路径
+		Icon      string `json:"icon,optional"` // 图标
+		SortOrder int    `json:"sortOrder,optional"` // 排序
+		PermTag   string `json:"permTag,optional"` // 权限标识
+		Status    int8   `json:"status,optional"` // 状态
+	}
+	CreateMenuResp {
+		Id int64 `json:"id"` // 菜单ID
+	}
+	// ========== 删除菜单 ==========
+	DeleteMenuReq {
+		Id int64 `path:"id"` // 菜单ID
+	}
+	DeleteMenuResp {
+		Id int64 `json:"id"` // 删除的菜单ID
+	}
+	// ========== 获取菜单详情 ==========
+	GetMenuReq {
+		Id int64 `path:"id"` // 菜单ID
+	}
+	GetMenuResp {
+		Id            int64  `json:"id"`
+		ParentId      int64  `json:"parentId"`
+		Name          string `json:"name"`
+		RoutePath     string `json:"routePath"`
+		ComponentPath string `json:"componentPath"`
+		Icon          string `json:"icon"`
+		SortOrder     int    `json:"sortOrder"`
+		PermTag       string `json:"permTag"`
+		Status        int8   `json:"status"`
+		CreatedAt     string `json:"createdAt"`
+		UpdatedAt     string `json:"updatedAt"`
+	}
+	// ========== 获取菜单树 ==========
+	GetMenuTreeReq {
+		Status int8 `form:"status,optional"` // 状态筛选
+	}
+	GetMenuTreeResp {
+		Tree []*MenuTreeNode `json:"tree"`
+	}
+	MenuTreeNode {
+		Id            int64           `json:"id"`
+		ParentId      int64           `json:"parentId"`
+		Name          string          `json:"name"`
+		RoutePath     string          `json:"routePath"`
+		ComponentPath string          `json:"componentPath"`
+		Icon          string          `json:"icon"`
+		SortOrder     int             `json:"sortOrder"`
+		PermTag       string          `json:"permTag"`
+		Status        int8            `json:"status"`
+		Children      []*MenuTreeNode `json:"children,optional"`
+	}
+	// ========== 更新菜单 ==========
+	UpdateMenuReq {
+		Id            int64  `path:"id"`
+		ParentId      int64  `json:"parentId,optional"`
+		Name          string `json:"name"`
+		RoutePath     string `json:"routePath,optional"`
+		ComponentPath string `json:"componentPath,optional"`
+		Icon          string `json:"icon,optional"`
+		SortOrder     int    `json:"sortOrder,optional"`
+		PermTag       string `json:"permTag,optional"`
+		Status        int8   `json:"status,optional"`
+	}
+	UpdateMenuResp {
+		Id int64 `json:"id"`
+	}
+)
+

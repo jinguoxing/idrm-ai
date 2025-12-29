@@ -1,0 +1,43 @@
+Name: idrm-api
+Host: 0.0.0.0
+Port: 8888
+
+# 数据库配置
+Database:
+  # SQLx配置
+  SQLx:
+    DataSource: ./idrm.db  # SQLite数据源
+    Driver: sqlite3        # 数据库驱动
+
+  # GORM配置
+  GORM:
+    DSN: ./idrm.db         # GORM数据源
+    LogLevel: info         # 日志级别: silent, error, warn, info
+    AutoMigrate: true      # 自动迁移表结构
+
+  # 连接池配置
+  Pool:
+    MaxOpenConns: 100      # 最大打开连接数
+    MaxIdleConns: 10       # 最大空闲连接数
+    ConnMaxLifetime: 1h    # 连接最大生存时间
+    ConnMaxIdleTime: 10m   # 连接最大空闲时间
+
+# ORM配置
+ORM:
+  Strategy: gorm_first     # ORM选择策略: gorm_first, sqlx_first, gorm_only, sqlx_only, auto
+  EnableMetrics: true      # 启用性能指标
+  EnableCache: false       # 启用缓存（暂未实现）
+  CacheTTL: 5m            # 缓存TTL
+
+# 缓存配置
+Cache:
+  RedisHost: 127.0.0.1:6379  # Redis主机
+  RedisPass: ""              # Redis密码
+  RedisType: node            # Redis类型
+  RedisDB: 0                 # Redis数据库
+
+# 日志配置
+Log:
+  ServiceName: idrm-api
+  Mode: console
+  Level: info

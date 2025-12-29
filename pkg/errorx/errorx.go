@@ -32,6 +32,14 @@ const (
 	// 系统管理错误 (50000-59999)
 	ErrCodeParentMenuNotFound = 1101 // 父级菜单不存在
 	ErrCodeMenuHasSubEntries  = 1102 // 存在子菜单无法直接删除
+
+	// 数据资源目录错误 (12000-12999)
+	ErrCodeDataCatalogNotFound           = 1201 // 数据资源目录不存在
+	ErrCodeDataCatalogDepartmentNotFound = 1202 // 数据资源目录关联部门不存在
+	ErrCodeDataCatalogColumnNotFound     = 1203 // 信息项不存在
+	ErrCodeCatalogNameRepeat             = 1204 // 数据目录名称重复
+	ErrCodeDataResourceNotExist          = 1205 // 数据资源已挂载或不存在
+	ErrCodeDataResourceTypeNotSupport    = 1206 // 数据资源类型不支持
 )
 
 // 错误消息映射
@@ -62,6 +70,14 @@ var errMsgMap = map[int]string{
 	// 系统管理错误
 	ErrCodeParentMenuNotFound: "父级菜单不存在",
 	ErrCodeMenuHasSubEntries:  "存在子菜单无法直接删除",
+
+	// 数据资源目录错误
+	ErrCodeDataCatalogNotFound:           "数据资源目录不存在",
+	ErrCodeDataCatalogDepartmentNotFound: "数据资源目录关联部门不存在",
+	ErrCodeDataCatalogColumnNotFound:     "信息项不存在",
+	ErrCodeCatalogNameRepeat:             "数据目录名称重复",
+	ErrCodeDataResourceNotExist:          "数据资源已挂载或不存在",
+	ErrCodeDataResourceTypeNotSupport:    "数据资源类型不支持",
 }
 
 // CodeError 业务错误

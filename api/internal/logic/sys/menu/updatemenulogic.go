@@ -89,7 +89,7 @@ func (l *UpdateMenuLogic) UpdateMenu(req *types.UpdateMenuReq) (*types.UpdateMen
 		Icon:          req.Icon,
 		SortOrder:     req.SortOrder,
 		PermTag:       req.PermTag,
-		Status:        req.Status,
+		Status:        int(req.Status), // int8 -> int
 	}
 
 	// 5. 调用Model层更新数据
@@ -110,8 +110,7 @@ func (l *UpdateMenuLogic) UpdateMenu(req *types.UpdateMenuReq) (*types.UpdateMen
 
 	// 7. 返回结果
 	return &types.UpdateMenuResp{
-		Id:   menuData.Id,
-		Name: menuData.Name,
+		Id: menuData.Id,
 	}, nil
 }
 
